@@ -43,7 +43,7 @@ export function QuestionCard({
           if (revealed && selected && !correct) className += ' wrong'
 
           return (
-            <li key={index}>
+            <li key={`${question.id}-${index}`}>
               <button
                 type="button"
                 className={className}

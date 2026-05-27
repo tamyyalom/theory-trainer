@@ -122,7 +122,7 @@ async function main() {
   }
 
   mkdirSync(dirname(OUT), { recursive: true })
-  writeFileSync(OUT, JSON.stringify(payload))
+  writeFileSync(OUT, JSON.stringify(payload, null, 2))
 
   console.log(`Wrote ${questions.length} questions → ${OUT}`)
   console.log('Categories:', byCategory)

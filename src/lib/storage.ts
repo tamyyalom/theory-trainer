@@ -1,6 +1,6 @@
 import type { Progress } from '../types'
 
-const STORAGE_KEY = 'theory-trainer-progress-v1'
+export const STORAGE_KEY = 'theory-trainer-progress-v1'
 
 export function emptyProgress(): Progress {
   return {
@@ -46,6 +46,6 @@ export function importProgressFile(file: File): Promise<Progress> {
   return file.text().then((raw) => {
     const parsed = JSON.parse(raw) as Progress
     if (parsed.version !== 1) throw new Error('קובץ לא תואם')
-    return parsed
+    return { ...emptyProgress(), ...parsed }
   })
 }

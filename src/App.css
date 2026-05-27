@@ -1,3 +1,5 @@
+/* ── Layout ─────────────────────────────────────────────── */
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -8,10 +10,15 @@
 .panel {
   width: min(880px, 100%);
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--clr-gray-200);
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+.panel .panel h1 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
 }
 
 .panel-header {
@@ -22,10 +29,12 @@
   margin-bottom: 14px;
 }
 
-h1 {
+.panel-header h1 {
   margin: 0;
   font-size: clamp(1.3rem, 2.4vw, 1.9rem);
 }
+
+/* ── Buttons ─────────────────────────────────────────────── */
 
 .btn {
   border: 1px solid transparent;
@@ -33,28 +42,29 @@ h1 {
   padding: 10px 14px;
   font-size: 0.98rem;
   cursor: pointer;
+  font-family: inherit;
 }
 
 .btn.primary {
-  background: #4f46e5;
+  background: var(--clr-primary);
   color: #fff;
 }
 
 .btn.secondary {
-  background: #eef2ff;
-  color: #1f2937;
-  border-color: #c7d2fe;
+  background: var(--clr-primary-light);
+  color: var(--clr-gray-800);
+  border-color: var(--clr-primary-border);
 }
 
 .btn.ghost {
   background: #fff;
-  color: #374151;
-  border-color: #d1d5db;
+  color: var(--clr-gray-700);
+  border-color: var(--clr-gray-300);
 }
 
 .btn.danger {
-  color: #b91c1c;
-  border-color: #fecaca;
+  color: var(--clr-danger-text);
+  border-color: var(--clr-danger-border);
 }
 
 .btn:disabled {
@@ -62,12 +72,10 @@ h1 {
   cursor: not-allowed;
 }
 
+/* ── Utilities ───────────────────────────────────────────── */
+
 .full {
   width: 100%;
-}
-
-.small {
-  margin-top: 8px;
 }
 
 .row {
@@ -83,6 +91,8 @@ h1 {
   margin-top: 12px;
 }
 
+/* ── Form ────────────────────────────────────────────────── */
+
 .field {
   display: grid;
   gap: 6px;
@@ -90,18 +100,21 @@ h1 {
 }
 
 .field select {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--clr-gray-300);
   border-radius: 10px;
   padding: 8px 10px;
+  font-family: inherit;
 }
 
 .counter {
   margin: 8px 0 14px;
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }
 
+/* ── Question card ───────────────────────────────────────── */
+
 .question-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--clr-gray-200);
   border-radius: 12px;
   padding: 14px;
 }
@@ -110,14 +123,14 @@ h1 {
   display: flex;
   justify-content: space-between;
   margin: 0 0 8px;
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }
 
 .badge {
   padding: 2px 8px;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
+  background: var(--clr-badge-bg);
+  color: var(--clr-primary-dark);
   font-size: 0.82rem;
 }
 
@@ -143,27 +156,33 @@ h1 {
 .answer {
   width: 100%;
   text-align: right;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--clr-gray-300);
   border-radius: 10px;
   background: #fff;
   padding: 10px 12px;
   display: flex;
   gap: 8px;
   align-items: center;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .answer.selected {
-  border-color: #4f46e5;
+  border-color: var(--clr-primary);
 }
 
 .answer.correct {
-  border-color: #16a34a;
-  background: #f0fdf4;
+  border-color: var(--clr-success);
+  background: var(--clr-success-bg);
 }
 
 .answer.wrong {
-  border-color: #ef4444;
-  background: #fef2f2;
+  border-color: var(--clr-danger);
+  background: var(--clr-danger-bg);
+}
+
+.answer:disabled {
+  cursor: default;
 }
 
 .answer-letter {
@@ -175,12 +194,14 @@ h1 {
 }
 
 .ok {
-  color: #15803d;
+  color: var(--clr-success-text);
 }
 
 .fail {
-  color: #b91c1c;
+  color: var(--clr-danger-text);
 }
+
+/* ── Status badge ────────────────────────────────────────── */
 
 .status {
   border-radius: 12px;
@@ -190,18 +211,18 @@ h1 {
 }
 
 .status-red {
-  background: #fef2f2;
-  border-color: #fecaca;
+  background: var(--clr-danger-bg);
+  border-color: var(--clr-danger-border);
 }
 
 .status-yellow {
-  background: #fffbeb;
-  border-color: #fde68a;
+  background: var(--clr-warning-bg);
+  border-color: var(--clr-warning-border);
 }
 
 .status-green {
-  background: #f0fdf4;
-  border-color: #bbf7d0;
+  background: var(--clr-success-bg);
+  border-color: var(--clr-success-border);
 }
 
 .status-title {
@@ -211,8 +232,10 @@ h1 {
 
 .status-sub {
   margin: 4px 0 0;
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }
+
+/* ── Stats grid ──────────────────────────────────────────── */
 
 .stats-grid {
   display: grid;
@@ -222,7 +245,7 @@ h1 {
 }
 
 .stat-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--clr-gray-200);
   border-radius: 12px;
   padding: 12px;
   text-align: center;
@@ -236,11 +259,13 @@ h1 {
 
 .stat-label {
   margin: 2px 0 0;
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }
 
+/* ── Weak categories ─────────────────────────────────────── */
+
 .weak-box {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--clr-gray-200);
   border-radius: 12px;
   padding: 10px;
   margin-bottom: 12px;
@@ -258,19 +283,23 @@ h1 {
 }
 
 .chip {
-  border: 1px solid #c7d2fe;
-  color: #3730a3;
-  background: #eef2ff;
+  border: 1px solid var(--clr-primary-border);
+  color: var(--clr-primary-dark);
+  background: var(--clr-primary-light);
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .chip.active {
-  background: #4f46e5;
+  background: var(--clr-primary);
   color: #fff;
-  border-color: #4338ca;
+  border-color: var(--clr-primary-hover);
 }
+
+/* ── Exam ────────────────────────────────────────────────── */
 
 .exam-rules {
   margin: 10px 0 14px;
@@ -284,7 +313,7 @@ h1 {
 }
 
 .exam-timer .label {
-  color: #6b7280;
+  color: var(--clr-gray-500);
   margin-inline-end: 6px;
 }
 
@@ -293,11 +322,11 @@ h1 {
 }
 
 .exam-timer.urgent .time {
-  color: #b91c1c;
+  color: var(--clr-danger-text);
 }
 
 .exam-progress {
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }
 
 .exam-nav {
@@ -305,6 +334,10 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.exam-submit {
+  margin-top: 8px;
 }
 
 .dots {
@@ -318,17 +351,21 @@ h1 {
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--clr-gray-300);
   background: #fff;
+  padding: 0;
+  cursor: pointer;
 }
 
 .dot.answered {
-  background: #a5b4fc;
+  background: var(--clr-dot-answered);
 }
 
 .dot.current {
-  border-color: #4338ca;
+  border-color: var(--clr-primary-hover);
 }
+
+/* ── Results ─────────────────────────────────────────────── */
 
 .result {
   font-size: 2rem;
@@ -336,15 +373,15 @@ h1 {
 }
 
 .result.pass {
-  color: #15803d;
+  color: var(--clr-success-text);
 }
 
 .result.fail {
-  color: #b91c1c;
+  color: var(--clr-danger-text);
 }
 
 .result-text {
-  color: #6b7280;
+  color: var(--clr-gray-500);
   margin: 0 0 12px;
 }
 
@@ -354,5 +391,5 @@ h1 {
 }
 
 .muted {
-  color: #6b7280;
+  color: var(--clr-gray-500);
 }

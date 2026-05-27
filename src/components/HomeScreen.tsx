@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import type { AppMode, Progress, Question } from '../types'
 import { PASS_SCORE, PASS_STREAK } from '../types'
 import { masteryPercent, readiness, readinessLabel, weakCategories } from '../lib/progress'
@@ -20,9 +20,9 @@ export function HomeScreen({
   onExport,
   onImport,
 }: Props) {
-  const readinessLevel = readiness(progress)
-  const mastery = masteryPercent(questions, progress)
-  const weak = weakCategories(questions, progress).slice(0, 3)
+  const readinessLevel = useMemo(() => readiness(progress), [progress])
+  const mastery = useMemo(() => masteryPercent(questions, progress), [questions, progress])
+  const weak = useMemo(() => weakCategories(questions, progress).slice(0, 3), [questions, progress])
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (

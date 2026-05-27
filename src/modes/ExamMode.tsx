@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Progress, Question } from '../types'
 import { EXAM_MINUTES, EXAM_SIZE, PASS_SCORE } from '../types'
 import { pickRandom } from '../lib/shuffle'
@@ -22,54 +22,59 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
   const [reviewIndex, setReviewIndex] = useState(0)
   const [answers, setAnswers] = useState<(number | null)[]>([])
   const [secondsLeft, setSecondsLeft] = useState(EXAM_MINUTES * 60)
+  const [finalScore, setFinalScore] = useState<{ correct: number; total: number } | null>(null)
 
-  const start = () => {
+  const start = useCallback(() => {
     const picked = pickRandom(questions, EXAM_SIZE)
     setExamQuestions(picked)
     setAnswers(new Array(picked.length).fill(null))
     setCurrent(0)
     setReviewIndex(0)
     setSecondsLeft(EXAM_MINUTES * 60)
+    setFinalScore(null)
     setPhase('active')
-  }
+  }, [questions])
 
   const submit = useCallback(() => {
-    let score = 0
-    examQuestions.forEach((q, i) => {
-      if (answers[i] === q.correctIndex) score++
+    setAnswers((currentAnswers) => {
+      setExamQuestions((currentQuestions) => {
+        let score = 0
+        currentQuestions.forEach((q, i) => {
+          if (currentAnswers[i] === q.correctIndex) score++
+        })
+        let next = progress
+        currentQuestions.forEach((q, i) => {
+          const picked = currentAnswers[i]
+          if (picked === null) return
+          next = recordAnswer(next, q.id, picked === q.correctIndex)
+        })
+        next = recordExam(next, score, currentQuestions.length)
+        onProgress(next)
+        setFinalScore({ correct: score, total: currentQuestions.length })
+        setPhase('done')
+        return currentQuestions
+      })
+      return currentAnswers
     })
-    let next = progress
-    examQuestions.forEach((q, i) => {
-      const picked = answers[i]
-      if (picked === null) return
-      next = recordAnswer(next, q.id, picked === q.correctIndex)
-    })
-    next = recordExam(next, score, examQuestions.length)
-    onProgress(next)
-    setPhase('done')
-  }, [answers, examQuestions, onProgress, progress])
+  }, [onProgress, progress])
 
   useEffect(() => {
     if (phase !== 'active') return
-    if (secondsLeft <= 0) {
-      submit()
-      return
-    }
-    const t = setInterval(() => setSecondsLeft((s) => s - 1), 1000)
+    const t = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(t)
+          submit()
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
     return () => clearInterval(t)
-  }, [phase, secondsLeft, submit])
+  }, [phase, submit])
 
   const q = examQuestions[current]
   const answeredCount = answers.filter((a) => a !== null).length
-
-  const reviewStats = useMemo(() => {
-    if (phase !== 'review' && phase !== 'done') return null
-    let correct = 0
-    examQuestions.forEach((question, i) => {
-      if (answers[i] === question.correctIndex) correct++
-    })
-    return { correct, total: examQuestions.length }
-  }, [phase, examQuestions, answers])
 
   if (phase === 'intro') {
     return (
@@ -93,12 +98,12 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
     )
   }
 
-  if (phase === 'done' && reviewStats) {
-    const passed = reviewStats.correct >= PASS_SCORE
+  if (phase === 'done' && finalScore) {
+    const passed = finalScore.correct >= PASS_SCORE
     return (
       <div className="panel">
         <h1 className={`result ${passed ? 'pass' : 'fail'}`}>
-          {reviewStats.correct}/{reviewStats.total}
+          {finalScore.correct}/{finalScore.total}
         </h1>
         <p className="result-text">
           {passed ? 'עברת את המבחן המדומה' : `צריך לפחות ${PASS_SCORE} — נסה שוב`}
@@ -218,7 +223,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
         )}
       </div>
 
-      <button type="button" className="btn ghost full small" onClick={submit}>
+      <button type="button" className="btn ghost full exam-submit" onClick={submit}>
         הגש מבחן עכשיו
       </button>
     </div>

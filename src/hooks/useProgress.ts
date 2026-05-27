@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Progress } from '../types'
-import { loadProgress, saveProgress } from '../lib/storage'
+import { emptyProgress, loadProgress, saveProgress } from '../lib/storage'
 
 export function useProgress() {
   const [progress, setProgress] = useState<Progress>(() => loadProgress())
@@ -14,9 +14,7 @@ export function useProgress() {
   }, [])
 
   const reset = useCallback(() => {
-    const empty = loadProgress()
-    localStorage.removeItem('theory-trainer-progress-v1')
-    setProgress({ ...empty, wrongCounts: {}, correctStreak: {}, lastAnsweredAt: {}, seenCount: {}, examHistory: [], customNotes: {} })
+    setProgress(emptyProgress())
   }, [])
 
   return { progress, update, reset, setProgress }

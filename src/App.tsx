@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 import type { AppMode, QuestionBank } from './types'
 import { LearnMode } from './modes/LearnMode'
@@ -41,16 +41,18 @@ function App() {
     }
   }, [])
 
-  const questions = useMemo(() => bank?.questions ?? [], [bank])
+  const questions = bank?.questions ?? []
 
-  const onImportProgress = async (file: File) => {
+  const onImportProgress = useCallback(async (file: File) => {
     try {
       const parsed = await importProgressFile(file)
       setProgress(parsed)
     } catch {
       alert('קובץ התקדמות לא תקין')
     }
-  }
+  }, [setProgress])
+
+  const onExport = useCallback(() => exportProgress(progress), [progress])
 
   if (loading) {
     return <main className="app-shell">טוען מאגר שאלות...</main>
@@ -78,7 +80,7 @@ function App() {
           progress={progress}
           onMode={setMode}
           onReset={reset}
-          onExport={() => exportProgress(progress)}
+          onExport={onExport}
           onImport={onImportProgress}
         />
       )}

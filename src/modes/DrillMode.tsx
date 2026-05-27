@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { Progress, Question } from '../types'
-import { drillQuestions, weakCategories } from '../lib/progress'
-import { recordAnswer } from '../lib/progress'
+import { drillQuestions, recordAnswer, weakCategories } from '../lib/progress'
 import { QuestionCard } from '../components/QuestionCard'
 
 interface Props {
@@ -15,19 +14,23 @@ export function DrillMode({ questions, progress, onProgress, onBack }: Props) {
   const weak = useMemo(() => weakCategories(questions, progress), [questions, progress])
   const [focusCategory, setFocusCategory] = useState<string | null>(null)
 
-  const pool = useMemo(() => {
-    if (focusCategory) {
-      const catQs = questions.filter((q) => q.category === focusCategory)
-      return drillQuestions(catQs, progress, 30)
-    }
-    return drillQuestions(questions, progress, 30)
-  }, [questions, progress, focusCategory])
+  // Pool is frozen at mount / when category changes — does not react to progress updates
+  const [pool, setPool] = useState<Question[]>(() => drillQuestions(questions, progress, 30))
 
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const [revealed, setRevealed] = useState(false)
   const [done, setDone] = useState(0)
   const [correct, setCorrect] = useState(0)
+
+  const changeCategory = (category: string | null) => {
+    setFocusCategory(category)
+    const source = category ? questions.filter((q) => q.category === category) : questions
+    setPool(drillQuestions(source, progress, 30))
+    setIndex(0)
+    setSelected(null)
+    setRevealed(false)
+  }
 
   const question = pool[index]
 
@@ -43,13 +46,11 @@ export function DrillMode({ questions, progress, onProgress, onBack }: Props) {
   }
 
   const finishSet = () => {
-    if (index + 1 >= pool.length) {
-      setIndex(0)
-      setSelected(null)
-      setRevealed(false)
-      return
-    }
-    setIndex((i) => i + 1)
+    setIndex((i) => {
+      const next = i + 1
+      if (next >= pool.length) return 0
+      return next
+    })
     setSelected(null)
     setRevealed(false)
   }
@@ -93,10 +94,7 @@ export function DrillMode({ questions, progress, onProgress, onBack }: Props) {
             <button
               type="button"
               className={`chip ${focusCategory === null ? 'active' : ''}`}
-              onClick={() => {
-                setFocusCategory(null)
-                setIndex(0)
-              }}
+              onClick={() => changeCategory(null)}
             >
               הכל
             </button>
@@ -105,10 +103,7 @@ export function DrillMode({ questions, progress, onProgress, onBack }: Props) {
                 key={w.category}
                 type="button"
                 className={`chip ${focusCategory === w.category ? 'active' : ''}`}
-                onClick={() => {
-                  setFocusCategory(w.category)
-                  setIndex(0)
-                }}
+                onClick={() => changeCategory(w.category)}
               >
                 {w.category} ({w.wrong})
               </button>

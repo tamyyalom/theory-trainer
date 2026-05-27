@@ -1,5 +1,6 @@
 import type { ExamResult, Progress, Question } from '../types'
 import { PASS_SCORE, PASS_STREAK } from '../types'
+import { shuffle } from './shuffle'
 
 export function recordAnswer(
   progress: Progress,
@@ -99,7 +100,7 @@ export function drillQuestions(questions: Question[], progress: Progress, limit 
     return { q, priority }
   })
 
-  scored.sort((a, b) => b.priority - a.priority || Math.random() - 0.5)
+  shuffle(scored).sort((a, b) => b.priority - a.priority)
   return scored.slice(0, limit).map((s) => s.q)
 }
 
