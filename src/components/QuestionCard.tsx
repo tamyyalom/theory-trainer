@@ -6,6 +6,8 @@ interface Props {
   revealed: boolean
   onSelect: (index: number) => void
   showHint?: boolean
+  /** Reserve fixed image area (exam mode) so card height stays stable */
+  fixedImageArea?: boolean
 }
 
 export function QuestionCard({
@@ -14,9 +16,14 @@ export function QuestionCard({
   revealed,
   onSelect,
   showHint = true,
+  fixedImageArea = false,
 }: Props) {
+  const image = question.imageUrl ? (
+    <img className="question-image" src={question.imageUrl} alt="" loading="lazy" />
+  ) : null
+
   return (
-    <article className="question-card">
+    <article className={`question-card ${fixedImageArea ? 'question-card-fixed' : ''}`}>
       <p className="question-meta">
         <span className="badge">{question.category}</span>
         <span className="qid">#{question.id}</span>
@@ -24,13 +31,12 @@ export function QuestionCard({
 
       <h2 className="question-text">{question.text}</h2>
 
-      {question.imageUrl && (
-        <img
-          className="question-image"
-          src={question.imageUrl}
-          alt=""
-          loading="lazy"
-        />
+      {fixedImageArea ? (
+        <div className="question-image-slot" aria-hidden={!question.imageUrl}>
+          {image}
+        </div>
+      ) : (
+        image
       )}
 
       <ul className="answers" role="listbox" aria-label="תשובות">

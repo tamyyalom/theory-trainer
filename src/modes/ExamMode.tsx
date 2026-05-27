@@ -5,6 +5,7 @@ import { pickRandom } from '../lib/shuffle'
 import { recordAnswer, recordExam } from '../lib/progress'
 import { QuestionCard } from '../components/QuestionCard'
 import { ExamTimer } from '../components/ExamTimer'
+import { ARROW_BACK, ARROW_FORWARD, labelBack } from '../lib/rtl'
 
 interface Props {
   questions: Question[]
@@ -78,12 +79,16 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
 
   if (phase === 'intro') {
     return (
-      <div className="panel">
-        <header className="panel-header">
+      <div className="panel mode-panel">
+        <header className="mode-header">
           <button type="button" className="btn ghost" onClick={onBack}>
-            ← חזרה
+            {labelBack('חזרה')}
           </button>
-          <h1>מבחן מלא</h1>
+          <div className="mode-header-copy">
+            <p className="mode-kicker">מצב מבחן</p>
+            <h1>מבחן מלא</h1>
+            <p className="mode-subtitle">סימולציה בתנאי אמת: 30 שאלות, טיימר, וללא רמזים במהלך הבחינה.</p>
+          </div>
         </header>
         <ul className="exam-rules">
           <li>{EXAM_SIZE} שאלות</li>
@@ -101,7 +106,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
   if (phase === 'done' && finalScore) {
     const passed = finalScore.correct >= PASS_SCORE
     return (
-      <div className="panel">
+      <div className="panel mode-panel">
         <h1 className={`result ${passed ? 'pass' : 'fail'}`}>
           {finalScore.correct}/{finalScore.total}
         </h1>
@@ -124,12 +129,15 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
   if (phase === 'review') {
     const rq = examQuestions[reviewIndex]
     return (
-      <div className="panel">
-        <header className="panel-header">
+      <div className="panel mode-panel">
+        <header className="mode-header">
           <button type="button" className="btn ghost" onClick={() => setPhase('done')}>
-            ← תוצאה
+            {labelBack('תוצאה')}
           </button>
-          <h1>סקירה</h1>
+          <div className="mode-header-copy">
+            <p className="mode-kicker">סקירה</p>
+            <h1>סקירת תשובות</h1>
+          </div>
         </header>
         <p className="counter">
           {reviewIndex + 1}/{examQuestions.length}
@@ -171,10 +179,26 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
     const next = [...answers]
     next[current] = index
     setAnswers(next)
+    if (current < examQuestions.length - 1) {
+      setCurrent((c) => c + 1)
+    }
+  }
+
+  const exitExam = () => {
+    const ok = window.confirm(
+      'לצאת מהמבחן? התקדמות במבחן הנוכחי לא תישמר.',
+    )
+    if (ok) onBack()
   }
 
   return (
-    <div className="panel exam-active">
+    <div className="panel mode-panel exam-active">
+      <div className="exam-active-header">
+        <button type="button" className="btn ghost" onClick={exitExam}>
+          {labelBack('יציאה מהמבחן')}
+        </button>
+      </div>
+
       <div className="exam-top">
         <ExamTimer secondsLeft={secondsLeft} />
         <span className="exam-progress">
@@ -188,6 +212,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
         revealed={false}
         onSelect={selectAnswer}
         showHint={false}
+        fixedImageArea
       />
 
       <div className="exam-nav">
@@ -197,7 +222,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
           disabled={current === 0}
           onClick={() => setCurrent((c) => c - 1)}
         >
-          ←
+          {ARROW_BACK}
         </button>
 
         <div className="dots">
@@ -214,7 +239,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
 
         {current < examQuestions.length - 1 ? (
           <button type="button" className="btn secondary" onClick={() => setCurrent((c) => c + 1)}>
-            →
+            {ARROW_FORWARD}
           </button>
         ) : (
           <button type="button" className="btn primary" onClick={submit}>
