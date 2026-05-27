@@ -258,8 +258,41 @@
 .question-meta {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 8px;
   margin: 0 0 8px;
   color: var(--clr-gray-500);
+}
+
+.question-meta-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bookmark-btn {
+  border: 1px solid var(--clr-gray-300);
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  background: #fff;
+  color: var(--clr-gray-500);
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.bookmark-btn.on {
+  border-color: var(--clr-warning-border);
+  color: #b45309;
+  background: var(--clr-warning-bg);
+}
+
+.bookmark-btn:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
 }
 
 .badge {
@@ -335,6 +368,11 @@
   transform: translateY(-1px);
   border-color: var(--clr-primary-border);
   box-shadow: 0 6px 14px rgba(79, 70, 229, 0.1);
+}
+
+.answer:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
 }
 
 .answer.selected {
@@ -554,6 +592,42 @@
   margin: 10px 0 14px;
 }
 
+.exam-resume-banner {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-warning-border);
+  background: linear-gradient(180deg, #fffefb, var(--clr-warning-bg));
+}
+
+.exam-resume-banner p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.exam-resume-hint {
+  margin-top: 6px !important;
+  font-size: 0.88rem;
+  color: var(--clr-gray-500);
+}
+
+.exam-intro-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.learn-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.learn-filter-row .mode-label {
+  flex-shrink: 0;
+}
+
 .exam-active-header {
   margin-bottom: 8px;
 }
@@ -616,6 +690,11 @@
 
 .dot.current {
   border-color: var(--clr-primary-hover);
+}
+
+.dot:focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 2px;
 }
 
 /* ── Results ─────────────────────────────────────────────── */

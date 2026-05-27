@@ -35,6 +35,8 @@ export interface Progress {
   seenCount: Record<string, number>
   examHistory: ExamResult[]
   customNotes: Record<string, string>
+  /** שאלות לסימון חזרה (לימוד לפי נושא / תרגול) */
+  bookmarkedQuestionIds: string[]
 }
 
 export type AppMode = 'home' | 'theory' | 'learn' | 'drill' | 'exam'

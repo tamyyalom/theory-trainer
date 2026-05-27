@@ -26,6 +26,11 @@ const modeLabels: Record<Exclude<AppMode, 'home'>, string> = {
   exam: 'מבחן',
 }
 
+function resumeButtonLabel(session: AppSession): string {
+  if (session.mode === 'exam') return 'המשך מבחן שמור'
+  return `המשך ${modeLabels[session.mode]} מאיפה שהפסקת`
+}
+
 export function HomeScreen({
   questions,
   progress,
@@ -55,6 +60,8 @@ export function HomeScreen({
   })()
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const bookmarkCount = progress.bookmarkedQuestionIds?.length ?? 0
+
   return (
     <section className="panel home-panel">
       <header className="home-hero">
@@ -77,7 +84,7 @@ export function HomeScreen({
 
       {savedSession && (
         <button type="button" className="btn secondary full resume-btn" onClick={onResume}>
-          המשך {modeLabels[savedSession.mode]} מאיפה שהפסקת
+          {resumeButtonLabel(savedSession)}
         </button>
       )}
 
@@ -93,6 +100,10 @@ export function HomeScreen({
         <article className="stat-card">
           <p className="stat-value">{progress.examHistory.length}</p>
           <p className="stat-label">מבחנים שבוצעו</p>
+        </article>
+        <article className="stat-card">
+          <p className="stat-value">{bookmarkCount}</p>
+          <p className="stat-label">מסומנות לחזרה</p>
         </article>
       </div>
 

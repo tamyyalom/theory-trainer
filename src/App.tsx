@@ -12,6 +12,7 @@ import { loadSession, saveSession, type AppSession } from './lib/session'
 import { validateQuestionBank } from './lib/validateBank'
 import { validateTheoryGuide } from './lib/validateTheory'
 import { clearTheoryProgress } from './lib/theoryProgress'
+import type { ExamSessionState } from './lib/examSession'
 
 const TheoryMode = lazy(() =>
   import('./modes/TheoryMode').then((m) => ({ default: m.TheoryMode })),
@@ -130,6 +131,17 @@ function AppContent() {
     setSavedSession(session)
     showToast('ממשיכים מאיפה שהפסקת')
   }, [showToast])
+
+  const persistExamSession = useCallback((snapshot: ExamSessionState | null) => {
+    if (snapshot === null) {
+      saveSession(null)
+      setSavedSession(null)
+      return
+    }
+    const session: AppSession = { mode: 'exam', exam: snapshot }
+    saveSession(session)
+    setSavedSession(session)
+  }, [])
 
   const practiceFromTheory = useCallback(
     (category: string) => {
@@ -283,6 +295,8 @@ function AppContent() {
             progress={progress}
             onProgress={setProgress}
             onBack={goHome}
+            savedExamSnapshot={savedSession?.mode === 'exam' ? savedSession.exam : undefined}
+            onExamPersist={persistExamSession}
           />
         )}
       </Suspense>

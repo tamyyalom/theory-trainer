@@ -8,6 +8,8 @@ interface Props {
   showHint?: boolean
   /** Reserve fixed image area (exam mode) so card height stays stable */
   fixedImageArea?: boolean
+  /** סימון לחזרה (לימוד / תרגול) */
+  bookmark?: { active: boolean; onToggle: () => void }
 }
 
 export function QuestionCard({
@@ -17,6 +19,7 @@ export function QuestionCard({
   onSelect,
   showHint = true,
   fixedImageArea = false,
+  bookmark,
 }: Props) {
   const image = question.imageUrl ? (
     <img className="question-image" src={question.imageUrl} alt="" loading="lazy" />
@@ -26,7 +29,20 @@ export function QuestionCard({
     <article className={`question-card ${fixedImageArea ? 'question-card-fixed' : ''}`}>
       <p className="question-meta">
         <span className="badge">{question.category}</span>
-        <span className="qid">#{question.id}</span>
+        <span className="question-meta-end">
+          <span className="qid">#{question.id}</span>
+          {bookmark && (
+            <button
+              type="button"
+              className={`bookmark-btn ${bookmark.active ? 'on' : ''}`}
+              onClick={bookmark.onToggle}
+              aria-pressed={bookmark.active}
+              aria-label={bookmark.active ? 'הסר מסימון לחזרה' : 'סמן לחזרה על השאלה'}
+            >
+              {bookmark.active ? '★' : '☆'}
+            </button>
+          )}
+        </span>
       </p>
 
       <h2 className="question-text">{question.text}</h2>

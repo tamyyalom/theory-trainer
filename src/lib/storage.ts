@@ -11,6 +11,7 @@ export function emptyProgress(): Progress {
     seenCount: {},
     examHistory: [],
     customNotes: {},
+    bookmarkedQuestionIds: [],
   }
 }
 

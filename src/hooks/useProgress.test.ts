@@ -18,6 +18,7 @@ describe('useProgress', () => {
         seenCount: { q1: 10 },
         examHistory: [{ id: '1', finishedAt: 1, score: 20, total: 30, passed: false }],
         customNotes: {},
+        bookmarkedQuestionIds: [],
       }),
     )
 

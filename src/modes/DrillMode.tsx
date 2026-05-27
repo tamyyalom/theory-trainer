@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Progress, Question } from '../types'
-import { drillQuestions, recordAnswer, weakCategories } from '../lib/progress'
+import { drillQuestions, recordAnswer, weakCategories, isBookmarked, toggleBookmark } from '../lib/progress'
 import { QuestionCard } from '../components/QuestionCard'
 import { labelBack } from '../lib/rtl'
 
@@ -216,6 +216,10 @@ export function DrillMode({
         selectedIndex={selected}
         revealed={revealed}
         onSelect={onSelect}
+        bookmark={{
+          active: isBookmarked(progress, question.id),
+          onToggle: () => onProgress(toggleBookmark(progress, question.id)),
+        }}
       />
 
       {revealed && (

@@ -1,5 +1,5 @@
 import type { Progress, Question } from '../types'
-import { drillQuestions, recordAnswer } from './progress'
+import { drillQuestions, recordAnswer, toggleBookmark, isBookmarked } from './progress'
 
 const baseProgress: Progress = {
   version: 1,
@@ -9,6 +9,7 @@ const baseProgress: Progress = {
   seenCount: {},
   examHistory: [],
   customNotes: {},
+  bookmarkedQuestionIds: [],
 }
 
 describe('progress', () => {
@@ -31,6 +32,13 @@ describe('progress', () => {
     const next = recordAnswer(withWrong, 'q1', true)
     expect(next.correctStreak.q1).toBe(2)
     expect(next.wrongCounts.q1).toBe(0)
+  })
+
+  it('toggles bookmark list', () => {
+    const next = toggleBookmark(baseProgress, 'q9')
+    expect(isBookmarked(next, 'q9')).toBe(true)
+    const back = toggleBookmark(next, 'q9')
+    expect(isBookmarked(back, 'q9')).toBe(false)
   })
 
   it('prioritizes weaker questions in drill mode', () => {

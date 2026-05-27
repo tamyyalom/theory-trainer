@@ -6,10 +6,17 @@ import { ExamMode } from './ExamMode'
 import type { Progress, Question } from '../types'
 import { emptyProgress } from '../lib/storage'
 
-function renderExam(props: ComponentProps<typeof ExamMode>) {
+function renderExam(overrides: Partial<ComponentProps<typeof ExamMode>> & Pick<
+  ComponentProps<typeof ExamMode>,
+  'questions' | 'progress' | 'onProgress' | 'onBack'
+>) {
   return render(
     <ConfirmProvider>
-      <ExamMode {...props} />
+      <ExamMode
+        onExamPersist={vi.fn()}
+        savedExamSnapshot={undefined}
+        {...overrides}
+      />
     </ConfirmProvider>,
   )
 }
@@ -52,6 +59,7 @@ describe('ExamMode', () => {
 
   it('submits exam and shows score', async () => {
     const onProgress = vi.fn()
+    const onExamPersist = vi.fn()
     const user = userEvent.setup()
 
     renderExam({
@@ -59,6 +67,7 @@ describe('ExamMode', () => {
       progress: baseProgress,
       onProgress,
       onBack: () => {},
+      onExamPersist,
     })
 
     await user.click(screen.getByText('התחל מבחן'))
@@ -76,6 +85,7 @@ describe('ExamMode', () => {
     const last = onProgress.mock.calls.at(-1)?.[0] as Progress
     expect(last.examHistory).toHaveLength(1)
     expect(last.examHistory[0]?.score).toBe(2)
+    expect(onExamPersist).toHaveBeenCalledWith(null)
   })
 
   it('auto-submits when timer expires', async () => {
@@ -153,7 +163,7 @@ describe('ExamMode', () => {
 
     expect(screen.getByText('שאלה שנייה')).toBeInTheDocument()
 
-    await user.click(screen.getByLabelText('שאלה 1'))
+    await user.click(screen.getByRole('radio', { name: /שאלה 1/ }))
     expect(screen.getByText('שאלה ראשונה')).toBeInTheDocument()
   })
 })

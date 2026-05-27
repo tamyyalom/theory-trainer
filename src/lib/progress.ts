@@ -33,6 +33,20 @@ export function recordAnswer(
   }
 }
 
+const MAX_BOOKMARKS = 400
+
+export function toggleBookmark(progress: Progress, questionId: string): Progress {
+  const prev = progress.bookmarkedQuestionIds ?? []
+  const set = new Set(prev)
+  if (set.has(questionId)) set.delete(questionId)
+  else set.add(questionId)
+  return { ...progress, bookmarkedQuestionIds: [...set].slice(0, MAX_BOOKMARKS) }
+}
+
+export function isBookmarked(progress: Progress, questionId: string): boolean {
+  return (progress.bookmarkedQuestionIds ?? []).includes(questionId)
+}
+
 export function recordExam(progress: Progress, score: number, total: number): Progress {
   const result: ExamResult = {
     id: crypto.randomUUID(),
@@ -96,7 +110,8 @@ export function drillQuestions(questions: Question[], progress: Progress, limit 
     const seen = progress.seenCount[q.id] ?? 0
     const last = progress.lastAnsweredAt[q.id] ?? 0
     const daysSince = (Date.now() - last) / (1000 * 60 * 60 * 24)
-    const priority = wrong * 10 + (seen === 0 ? 5 : 0) + (daysSince > 2 ? 2 : 0)
+    const marked = (progress.bookmarkedQuestionIds ?? []).includes(q.id) ? 4 : 0
+    const priority = wrong * 10 + marked + (seen === 0 ? 5 : 0) + (daysSince > 2 ? 2 : 0)
     return { q, priority }
   })
 
