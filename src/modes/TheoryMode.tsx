@@ -177,6 +177,15 @@ export function TheoryMode({
           {prog.read}/{prog.total} נושאים בפרק
         </p>
 
+        <div className="theory-practice-banner">
+          <p>
+            <strong>קטגוריית שאלות במבחן:</strong> {chapter.questionCategory}
+          </p>
+          <p className="theory-practice-banner-hint">
+            אחרי הקריאה, עבור לתרגול שאלות מאותה קטגוריה במאגר הרשמי.
+          </p>
+        </div>
+
         <ul className="theory-section-list">
           {chapter.sections.map((sec, i) => {
             const read = theoryProgress.readSectionIds.includes(sec.id)
