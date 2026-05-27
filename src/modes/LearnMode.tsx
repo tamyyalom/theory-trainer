@@ -1,28 +1,48 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { Progress, Question } from '../types'
 import { recordAnswer } from '../lib/progress'
 import { QuestionCard } from '../components/QuestionCard'
+import { labelBack } from '../lib/rtl'
 
 interface Props {
   questions: Question[]
   progress: Progress
   onProgress: (p: Progress) => void
   onBack: () => void
+  initialCategory?: string
+  initialIndex?: number
+  onSessionChange?: (payload: { category: string; index: number }) => void
 }
 
-export function LearnMode({ questions, progress, onProgress, onBack }: Props) {
+export function LearnMode({
+  questions,
+  progress,
+  onProgress,
+  onBack,
+  initialCategory,
+  initialIndex = 0,
+  onSessionChange,
+}: Props) {
   const categories = useMemo(
     () => [...new Set(questions.map((q) => q.category))].sort(),
     [questions],
   )
-  const [category, setCategory] = useState(categories[0] ?? '')
+  const [category, setCategory] = useState(
+    () => initialCategory && categories.includes(initialCategory) ? initialCategory : (categories[0] ?? ''),
+  )
   const filtered = useMemo(
     () => questions.filter((q) => q.category === category),
     [questions, category],
   )
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(() =>
+    Math.min(initialIndex, Math.max(filtered.length - 1, 0)),
+  )
   const [selected, setSelected] = useState<number | null>(null)
   const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    onSessionChange?.({ category, index })
+  }, [category, index, onSessionChange])
 
   const question = filtered[index]
 
@@ -57,16 +77,20 @@ export function LearnMode({ questions, progress, onProgress, onBack }: Props) {
   }
 
   return (
-    <div className="panel">
-      <header className="panel-header">
+    <div className="panel mode-panel">
+      <header className="mode-header">
         <button type="button" className="btn ghost" onClick={onBack}>
-          ← חזרה
+          {labelBack('חזרה')}
         </button>
-        <h1>לימוד לפי נושא</h1>
+        <div className="mode-header-copy">
+          <p className="mode-kicker">מצב לימוד</p>
+          <h1>לימוד לפי נושא</h1>
+          <p className="mode-subtitle">מתרגלים שאלה-שאלה עם פתרון מיידי להבנה וזיכרון טובים יותר.</p>
+        </div>
       </header>
 
-      <label className="field">
-        <span>נושא</span>
+      <label className="field mode-filter">
+        <span className="mode-label">נושא</span>
         <select
           value={category}
           onChange={(e) => {
@@ -84,7 +108,7 @@ export function LearnMode({ questions, progress, onProgress, onBack }: Props) {
         </select>
       </label>
 
-      <p className="counter">
+      <p className="counter mode-counter">
         שאלה {index + 1} מתוך {filtered.length}
       </p>
 
@@ -95,11 +119,11 @@ export function LearnMode({ questions, progress, onProgress, onBack }: Props) {
         onSelect={onSelect}
       />
 
-      <div className="row">
-        <button type="button" className="btn secondary" onClick={prev}>
+      <div className="row mode-actions-row">
+        <button type="button" className="btn secondary mode-action-btn" onClick={prev}>
           הקודם
         </button>
-        <button type="button" className="btn primary" onClick={next}>
+        <button type="button" className="btn primary mode-action-btn" onClick={next}>
           הבא
         </button>
       </div>

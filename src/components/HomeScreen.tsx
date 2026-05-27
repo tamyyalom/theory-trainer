@@ -1,34 +1,71 @@
 import { useMemo, useRef } from 'react'
-import type { AppMode, Progress, Question } from '../types'
+import type { AppMode, Progress, Question, TheoryGuide } from '../types'
+import { loadTheoryProgress } from '../lib/theoryProgress'
 import { PASS_SCORE, PASS_STREAK } from '../types'
 import { masteryPercent, readiness, readinessLabel, weakCategories } from '../lib/progress'
+import type { AppSession } from '../lib/session'
+import { ARROW_FORWARD } from '../lib/rtl'
 
 interface Props {
   questions: Question[]
   progress: Progress
   onMode: (mode: AppMode) => void
-  onReset: () => void
+  onResetQuestions: () => void
+  onResetTheory: () => void
   onExport: () => void
   onImport: (file: File) => Promise<void>
+  savedSession: AppSession | null
+  onResume: () => void
+  theoryGuide: TheoryGuide | null
+}
+
+const modeLabels: Record<Exclude<AppMode, 'home'>, string> = {
+  theory: 'תיאוריה',
+  learn: 'שאלות',
+  drill: 'תרגול',
+  exam: 'מבחן',
 }
 
 export function HomeScreen({
   questions,
   progress,
   onMode,
-  onReset,
+  onResetQuestions,
+  onResetTheory,
   onExport,
   onImport,
+  savedSession,
+  onResume,
+  theoryGuide,
 }: Props) {
   const readinessLevel = useMemo(() => readiness(progress), [progress])
   const mastery = useMemo(() => masteryPercent(questions, progress), [questions, progress])
   const weak = useMemo(() => weakCategories(questions, progress).slice(0, 3), [questions, progress])
+  const theoryTotal = useMemo(
+    () => theoryGuide?.chapters.reduce((n, ch) => n + ch.sections.length, 0) ?? 0,
+    [theoryGuide],
+  )
+  const theoryRead = (() => {
+    if (!theoryGuide) return 0
+    const readIds = new Set(loadTheoryProgress().readSectionIds)
+    return theoryGuide.chapters.reduce(
+      (n, ch) => n + ch.sections.filter((s) => readIds.has(s.id)).length,
+      0,
+    )
+  })()
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <section className="panel">
-      <header className="panel-header">
-        <h1>Theory Trainer</h1>
+    <section className="panel home-panel">
+      <header className="home-hero">
+        <div>
+          <p className="home-kicker">Theory Trainer</p>
+          <h1>מוכנים לתיאוריה, בצורה חכמה</h1>
+          <p className="home-subtitle">
+            לומדים את ההיגיון, מתרגלים שאלות, וניגשים למבחן רק כשבאמת מוכנים.
+          </p>
+        </div>
+        <div className="home-glow" aria-hidden="true" />
       </header>
 
       <div className={`status status-${readinessLevel}`}>
@@ -37,6 +74,12 @@ export function HomeScreen({
           {PASS_STREAK} מבחנים אחרונים · ציון עובר {PASS_SCORE}
         </p>
       </div>
+
+      {savedSession && (
+        <button type="button" className="btn secondary full resume-btn" onClick={onResume}>
+          המשך {modeLabels[savedSession.mode]} מאיפה שהפסקת
+        </button>
+      )}
 
       <div className="stats-grid">
         <article className="stat-card">
@@ -66,19 +109,42 @@ export function HomeScreen({
         </div>
       )}
 
-      <div className="stack">
-        <button type="button" className="btn primary full" onClick={() => onMode('learn')}>
-          לימוד לפי נושא
+      <div className="home-actions-grid">
+        {theoryGuide && (
+          <button type="button" className="action-card action-card-primary" onClick={() => onMode('theory')}>
+            <span className="action-card-title">תיאוריה מקוצרת</span>
+            <span className="action-card-subtitle">להבין את ההיגיון לפני תרגול</span>
+            <span className="action-card-arrow">{ARROW_FORWARD}</span>
+          </button>
+        )}
+        <button
+          type="button"
+          className={theoryGuide ? 'action-card' : 'action-card action-card-primary'}
+          onClick={() => onMode('learn')}
+        >
+          <span className="action-card-title">תרגול לפי נושא</span>
+          <span className="action-card-subtitle">שאלות ממוקדות לפי קטגוריה</span>
+          <span className="action-card-arrow">{ARROW_FORWARD}</span>
         </button>
-        <button type="button" className="btn secondary full" onClick={() => onMode('drill')}>
-          תרגול חכם
+        <button type="button" className="action-card" onClick={() => onMode('drill')}>
+          <span className="action-card-title">תרגול חכם</span>
+          <span className="action-card-subtitle">חיזוק חולשות אוטומטי</span>
+          <span className="action-card-arrow">{ARROW_FORWARD}</span>
         </button>
-        <button type="button" className="btn secondary full" onClick={() => onMode('exam')}>
-          מבחן מלא
+        <button type="button" className="action-card" onClick={() => onMode('exam')}>
+          <span className="action-card-title">מבחן מלא</span>
+          <span className="action-card-subtitle">סימולציה מלאה עם טיימר</span>
+          <span className="action-card-arrow">{ARROW_FORWARD}</span>
         </button>
       </div>
 
-      <div className="row">
+      {theoryGuide && theoryTotal > 0 && (
+        <p className="muted theory-home-hint">
+          מומלץ: קודם תיאוריה ({theoryRead}/{theoryTotal} נושאים), אחר כך שאלות.
+        </p>
+      )}
+
+      <div className="row home-tools">
         <button type="button" className="btn ghost" onClick={onExport}>
           יצוא התקדמות
         </button>
@@ -91,9 +157,14 @@ export function HomeScreen({
         >
           יבוא התקדמות
         </button>
-        <button type="button" className="btn ghost danger" onClick={onReset}>
-          איפוס
+        <button type="button" className="btn ghost danger" onClick={onResetQuestions}>
+          איפוס שאלות
         </button>
+        {theoryGuide && (
+          <button type="button" className="btn ghost danger" onClick={onResetTheory}>
+            איפוס לימוד תיאוריה
+          </button>
+        )}
         <input
           ref={inputRef}
           type="file"
