@@ -37,7 +37,36 @@ export interface Progress {
   customNotes: Record<string, string>
 }
 
-export type AppMode = 'home' | 'learn' | 'drill' | 'exam'
+export type AppMode = 'home' | 'theory' | 'learn' | 'drill' | 'exam'
+
+export interface TheorySection {
+  id: string
+  title: string
+  body: string
+  imageUrl?: string
+  imageCaption?: string
+  why?: string
+  remember?: string
+}
+
+export interface TheoryChapter {
+  id: string
+  title: string
+  description: string
+  /** קטגוריית השאלות במאגר הרשמי */
+  questionCategory: string
+  order: number
+  sections: TheorySection[]
+}
+
+export interface TheoryGuide {
+  meta: {
+    version: 1
+    title: string
+    updatedAt: string
+  }
+  chapters: TheoryChapter[]
+}
 
 export const EXAM_SIZE = 30
 export const EXAM_MINUTES = 40
