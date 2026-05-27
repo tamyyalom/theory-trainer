@@ -3,7 +3,10 @@ import './App.css'
 import type { AppMode, QuestionBank, TheoryGuide } from './types'
 import { HomeScreen } from './components/HomeScreen'
 import { useProgress } from './hooks/useProgress'
-import { ToastProvider, useToast } from './hooks/useToast'
+import { ConfirmProvider } from './components/ConfirmProvider'
+import { ToastProvider } from './components/ToastProvider'
+import { useConfirm } from './hooks/useConfirm'
+import { useToast } from './hooks/useToast'
 import { exportProgress, importProgressFile } from './lib/storage'
 import { loadSession, saveSession, type AppSession } from './lib/session'
 import { validateQuestionBank } from './lib/validateBank'
@@ -37,6 +40,7 @@ function AppContent() {
   const [resumePayload, setResumePayload] = useState<AppSession | null>(null)
   const { progress, setProgress, reset } = useProgress()
   const { showToast } = useToast()
+  const { confirm } = useConfirm()
 
   useEffect(() => {
     let mounted = true
@@ -154,21 +158,36 @@ function AppContent() {
     showToast('קובץ התקדמות הורד')
   }, [progress, showToast])
 
-  const onResetQuestions = useCallback(() => {
+  const onResetQuestions = useCallback(async () => {
+    const ok = await confirm({
+      title: 'איפוס התקדמות שאלות',
+      message:
+        'לאפס את כל התשובות, הסטטיסטיקה והיסטוריית המבחנים? פעולה זו לא ניתנת לביטול.',
+      confirmLabel: 'איפוס שאלות',
+      danger: true,
+    })
+    if (!ok) return
     reset()
     saveSession(null)
     setSavedSession(null)
     showToast('התקדמות שאלות ומבחנים אופסה')
-  }, [reset, showToast])
+  }, [confirm, reset, showToast])
 
-  const onResetTheory = useCallback(() => {
+  const onResetTheory = useCallback(async () => {
+    const ok = await confirm({
+      title: 'איפוס לימוד תיאוריה',
+      message: 'למחוק את סימון הנושאים שנקראו בתיאוריה המקוצרת?',
+      confirmLabel: 'איפוס תיאוריה',
+      danger: true,
+    })
+    if (!ok) return
     clearTheoryProgress()
     if (savedSession?.mode === 'theory') {
       saveSession(null)
       setSavedSession(null)
     }
     showToast('התקדמות לימוד תיאוריה אופסה')
-  }, [savedSession?.mode, showToast])
+  }, [confirm, savedSession?.mode, showToast])
 
   if (loading) {
     return <main className="app-shell">טוען מאגר שאלות...</main>
@@ -274,7 +293,9 @@ function AppContent() {
 function App() {
   return (
     <ToastProvider>
-      <AppContent />
+      <ConfirmProvider>
+        <AppContent />
+      </ConfirmProvider>
     </ToastProvider>
   )
 }

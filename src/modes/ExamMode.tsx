@@ -5,6 +5,7 @@ import { pickRandom } from '../lib/shuffle'
 import { recordAnswer, recordExam } from '../lib/progress'
 import { QuestionCard } from '../components/QuestionCard'
 import { ExamTimer } from '../components/ExamTimer'
+import { useConfirm } from '../hooks/useConfirm'
 import { ARROW_BACK, ARROW_FORWARD, labelBack } from '../lib/rtl'
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 type Phase = 'intro' | 'active' | 'review' | 'done'
 
 export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
+  const { confirm } = useConfirm()
   const [phase, setPhase] = useState<Phase>('intro')
   const [examQuestions, setExamQuestions] = useState<Question[]>([])
   const [current, setCurrent] = useState(0)
@@ -184,10 +186,13 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
     }
   }
 
-  const exitExam = () => {
-    const ok = window.confirm(
-      'לצאת מהמבחן? התקדמות במבחן הנוכחי לא תישמר.',
-    )
+  const exitExam = async () => {
+    const ok = await confirm({
+      title: 'יציאה מהמבחן',
+      message: 'התקדמות במבחן הנוכחי לא תישמר. לצאת בכל זאת?',
+      confirmLabel: 'יציאה מהמבחן',
+      danger: true,
+    })
     if (ok) onBack()
   }
 

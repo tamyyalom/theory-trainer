@@ -647,6 +647,70 @@
   color: var(--clr-gray-500);
 }
 
+/* ── Confirm dialog ──────────────────────────────────────── */
+
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.confirm-dialog {
+  width: min(420px, 100%);
+  border-radius: 16px;
+  border: 1px solid var(--clr-gray-200);
+  background: #fff;
+  padding: 18px;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.18);
+}
+
+.confirm-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.confirm-message {
+  margin: 0 0 16px;
+  color: var(--clr-gray-700);
+  line-height: 1.5;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+.confirm-actions .btn.danger {
+  background: var(--clr-danger);
+  color: #fff;
+  border-color: transparent;
+}
+
+.theory-practice-banner {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-primary-border);
+  background: linear-gradient(180deg, #f8faff, #eef2ff);
+}
+
+.theory-practice-banner p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.theory-practice-banner-hint {
+  margin-top: 6px !important;
+  font-size: 0.88rem;
+  color: var(--clr-gray-500);
+}
+
 /* ── Toast ───────────────────────────────────────────────── */
 
 .toast-stack {
@@ -899,4 +963,94 @@
   margin-top: 6px;
   color: var(--clr-gray-500);
   font-size: 0.85rem;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .panel {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .home-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .home-glow {
+    width: 64px;
+    height: 64px;
+    align-self: flex-end;
+  }
+
+  .home-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-header {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-header .btn.ghost {
+    justify-self: start;
+  }
+
+  .exam-top {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .exam-nav {
+    flex-wrap: wrap;
+  }
+
+  .exam-nav > .btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 12px;
+  }
+
+  .dots {
+    order: 3;
+    width: 100%;
+    max-height: 88px;
+    overflow-y: auto;
+    justify-content: center;
+    padding: 4px 0;
+  }
+
+  .question-card-fixed .question-image-slot {
+    height: min(42vw, 168px);
+  }
+
+  .question-text {
+    font-size: 1rem;
+  }
+
+  .answer {
+    padding: 12px;
+    min-height: 44px;
+  }
+
+  .confirm-actions {
+    flex-direction: column-reverse;
+  }
+
+  .confirm-actions .btn {
+    width: 100%;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  .row .btn {
+    width: 100%;
+  }
 }

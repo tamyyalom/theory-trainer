@@ -1,8 +1,18 @@
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, within } from '@testing-library/react'
+import type { ComponentProps } from 'react'
 import userEvent from '@testing-library/user-event'
+import { ConfirmProvider } from '../components/ConfirmProvider'
 import { ExamMode } from './ExamMode'
 import type { Progress, Question } from '../types'
 import { emptyProgress } from '../lib/storage'
+
+function renderExam(props: ComponentProps<typeof ExamMode>) {
+  return render(
+    <ConfirmProvider>
+      <ExamMode {...props} />
+    </ConfirmProvider>,
+  )
+}
 
 vi.mock('../lib/shuffle', () => ({
   pickRandom: (items: Question[]) => items.slice(0, 2),
@@ -44,14 +54,12 @@ describe('ExamMode', () => {
     const onProgress = vi.fn()
     const user = userEvent.setup()
 
-    render(
-      <ExamMode
-        questions={questions}
-        progress={baseProgress}
-        onProgress={onProgress}
-        onBack={() => {}}
-      />,
-    )
+    renderExam({
+      questions,
+      progress: baseProgress,
+      onProgress,
+      onBack: () => {},
+    })
 
     await user.click(screen.getByText('התחל מבחן'))
     expect(screen.getByText('שאלה ראשונה')).toBeInTheDocument()
@@ -74,14 +82,12 @@ describe('ExamMode', () => {
     const onProgress = vi.fn()
     const user = userEvent.setup()
 
-    render(
-      <ExamMode
-        questions={questions}
-        progress={baseProgress}
-        onProgress={onProgress}
-        onBack={() => {}}
-      />,
-    )
+    renderExam({
+      questions,
+      progress: baseProgress,
+      onProgress,
+      onBack: () => {},
+    })
 
     await user.click(screen.getByText('התחל מבחן'))
 
@@ -96,40 +102,36 @@ describe('ExamMode', () => {
   it('exits active exam after confirmation', async () => {
     const onBack = vi.fn()
     const user = userEvent.setup()
-    vi.spyOn(window, 'confirm').mockReturnValue(true)
 
-    render(
-      <ExamMode
-        questions={questions}
-        progress={baseProgress}
-        onProgress={() => {}}
-        onBack={onBack}
-      />,
-    )
+    renderExam({
+      questions,
+      progress: baseProgress,
+      onProgress: () => {},
+      onBack,
+    })
 
     await user.click(screen.getByText('התחל מבחן'))
     await user.click(screen.getByRole('button', { name: /יציאה מהמבחן/ }))
+    const dialog = screen.getByRole('alertdialog')
+    await user.click(within(dialog).getByRole('button', { name: 'יציאה מהמבחן' }))
 
-    expect(window.confirm).toHaveBeenCalled()
     expect(onBack).toHaveBeenCalled()
   })
 
   it('stays in exam when exit is cancelled', async () => {
     const onBack = vi.fn()
     const user = userEvent.setup()
-    vi.spyOn(window, 'confirm').mockReturnValue(false)
 
-    render(
-      <ExamMode
-        questions={questions}
-        progress={baseProgress}
-        onProgress={() => {}}
-        onBack={onBack}
-      />,
-    )
+    renderExam({
+      questions,
+      progress: baseProgress,
+      onProgress: () => {},
+      onBack,
+    })
 
     await user.click(screen.getByText('התחל מבחן'))
     await user.click(screen.getByRole('button', { name: /יציאה מהמבחן/ }))
+    await user.click(screen.getByRole('button', { name: 'ביטול' }))
 
     expect(onBack).not.toHaveBeenCalled()
     expect(screen.getByText('שאלה ראשונה')).toBeInTheDocument()
@@ -138,14 +140,12 @@ describe('ExamMode', () => {
   it('auto-advances after answer but allows manual navigation', async () => {
     const user = userEvent.setup()
 
-    render(
-      <ExamMode
-        questions={questions}
-        progress={baseProgress}
-        onProgress={() => {}}
-        onBack={() => {}}
-      />,
-    )
+    renderExam({
+      questions,
+      progress: baseProgress,
+      onProgress: () => {},
+      onBack: () => {},
+    })
 
     await user.click(screen.getByText('התחל מבחן'))
     const answerButtons = screen.getAllByRole('button').filter((b) => b.classList.contains('answer'))
