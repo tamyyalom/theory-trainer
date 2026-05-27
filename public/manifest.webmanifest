@@ -1,0 +1,20 @@
+{
+  "name": "Theory Trainer — תיאוריה",
+  "short_name": "תיאוריה",
+  "description": "תרגול תיאוריה ורישיון B",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#4f46e5",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -22,6 +22,10 @@ npm run dev
 - `npm run test` - הרצת בדיקות (Vitest)
 - `npm run lint` - הרצת ESLint
 
+## התקנה על מסך הבית (PWA)
+
+האתר כולל `manifest.webmanifest` ו-Service Worker שמנסה לשמור במטמון את `questions.json` ו-`theory.json` לקריאה חוזרת (בפרודקשן בלבד). בכרום/אנדרואיד: תפריט הדפדפן → **התקן אפליקציה** / **Add to Home screen**.
+
 ## Deploy (Vercel)
 
 1. חבר את הריפו ב-GitHub ל-Vercel
