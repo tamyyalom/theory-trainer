@@ -19,6 +19,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
   const [phase, setPhase] = useState<Phase>('intro')
   const [examQuestions, setExamQuestions] = useState<Question[]>([])
   const [current, setCurrent] = useState(0)
+  const [reviewIndex, setReviewIndex] = useState(0)
   const [answers, setAnswers] = useState<(number | null)[]>([])
   const [secondsLeft, setSecondsLeft] = useState(EXAM_MINUTES * 60)
 
@@ -27,6 +28,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
     setExamQuestions(picked)
     setAnswers(new Array(picked.length).fill(null))
     setCurrent(0)
+    setReviewIndex(0)
     setSecondsLeft(EXAM_MINUTES * 60)
     setPhase('active')
   }
@@ -45,10 +47,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
     next = recordExam(next, score, examQuestions.length)
     onProgress(next)
     setPhase('done')
-    setScore(score)
   }, [answers, examQuestions, onProgress, progress])
-
-  const [score, setScore] = useState(0)
 
   useEffect(() => {
     if (phase !== 'active') return
@@ -118,8 +117,7 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
   }
 
   if (phase === 'review') {
-    const [ri, setRi] = useState(0)
-    const rq = examQuestions[ri]
+    const rq = examQuestions[reviewIndex]
     return (
       <div className="panel">
         <header className="panel-header">
@@ -129,12 +127,12 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
           <h1>סקירה</h1>
         </header>
         <p className="counter">
-          {ri + 1}/{examQuestions.length}
+          {reviewIndex + 1}/{examQuestions.length}
         </p>
         {rq && (
           <QuestionCard
             question={rq}
-            selectedIndex={answers[ri]}
+            selectedIndex={answers[reviewIndex]}
             revealed
             onSelect={() => {}}
             showHint
@@ -144,16 +142,16 @@ export function ExamMode({ questions, progress, onProgress, onBack }: Props) {
           <button
             type="button"
             className="btn secondary"
-            disabled={ri === 0}
-            onClick={() => setRi((i) => i - 1)}
+            disabled={reviewIndex === 0}
+            onClick={() => setReviewIndex((i) => i - 1)}
           >
             הקודם
           </button>
           <button
             type="button"
             className="btn secondary"
-            disabled={ri >= examQuestions.length - 1}
-            onClick={() => setRi((i) => i + 1)}
+            disabled={reviewIndex >= examQuestions.length - 1}
+            onClick={() => setReviewIndex((i) => i + 1)}
           >
             הבא
           </button>
